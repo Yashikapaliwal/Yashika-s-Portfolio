@@ -2,6 +2,38 @@
    Yashika — Portfolio Interactions
    ========================================================= */
 
+// ---------- Animated stat counters ----------
+(function () {
+  const nums = document.querySelectorAll('.stat__num[data-count-to]');
+  if (!nums.length) return;
+
+  function animateCount(el) {
+    const target = parseInt(el.dataset.countTo, 10);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1400;
+    const start = performance.now();
+
+    function step(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const statIo = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCount(entry.target);
+        statIo.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  nums.forEach(el => statIo.observe(el));
+})();
+
 // ---------- Site-wide constellation background ----------
 (function () {
   const canvas = document.getElementById('bg-canvas');
